@@ -15,15 +15,14 @@
  * limitations under the License.
  */
 
-package org.apache.shardingsphere.example.core.api;
-
-import org.apache.shardingsphere.example.core.api.service.ExampleService;
+package org.apache.shardingsphere.example.transaction.xa.bitronix.raw.jdbc;
 
 import java.sql.SQLException;
+import org.apache.shardingsphere.example.core.api.service.ExampleService;
 
 public final class ExampleExecuteTemplate {
     
-    public static void run(final ExampleService exampleService) throws SQLException {
+    public static void runMysqlDownAndRecovery(final OrderServiceImpl exampleService) throws SQLException {
         try {
             exampleService.initEnvironment();
             exampleService.processSuccess();
@@ -32,7 +31,7 @@ public final class ExampleExecuteTemplate {
         }
     }
     
-    public static void runFailure(final ExampleService exampleService) throws SQLException {
+    public static void runFailure(final OrderServiceImpl exampleService) throws SQLException {
         try {
             exampleService.initEnvironment();
             exampleService.processFailure();
@@ -41,12 +40,12 @@ public final class ExampleExecuteTemplate {
         }
     }
     
-    public static void runRecovery(final ExampleService exampleService) throws SQLException {
-        try {
-            exampleService.initEnvironment();
-            exampleService.processFailure();
-        } finally {
-            exampleService.cleanEnvironment();
-        }
+    public static void runAppShutDownEnv(final OrderServiceImpl exampleService) throws SQLException {
+        exampleService.initEnvironment();
+        exampleService.createEnv();
+    }
+    
+    public static void runAppShutDownRecovery(final OrderServiceImpl exampleService) throws SQLException {
+        exampleService.recovery();
     }
 }

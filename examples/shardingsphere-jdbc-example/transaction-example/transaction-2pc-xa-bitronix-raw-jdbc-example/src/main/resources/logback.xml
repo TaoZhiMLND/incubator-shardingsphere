@@ -28,7 +28,7 @@
         </encoder>
     </appender>
     
-    <logger name="bitronix.tm" level="info"/>
+    <logger name="bitronix.tm" level="debug"/>
     <logger name="com.zaxxer.hikari" level="off"/>
     
     <root>

@@ -65,8 +65,25 @@ class OrderServiceImpl implements ExampleService {
             doInsert(preparedStatement);
             connection.commit();
             System.out.println("INSERT 10 orders success");
+        } catch (Exception e) {
+            e.getStackTrace();
         }
         int quantity = selectAll();
+        while(quantity != 10) {
+            System.out.printf("Waiting for recovery success, current quantity of orders is %d \n", quantity);
+            try {
+                TransactionTypeHolder.set(TransactionType.XA);
+                try (Connection connection = dataSource.getConnection()) {
+                    connection.setAutoCommit(false);
+                    quantity = selectAll();
+                    Thread.sleep(12240);
+                    connection.commit();
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        
         System.out.printf("Commit, expect:10, actual:%d \n", quantity);
         printData();
         System.out.println("-------------------- Process End -----------------------");
@@ -122,7 +139,44 @@ class OrderServiceImpl implements ExampleService {
             while (resultSet.next()) {
                 result = resultSet.getInt(1);
             }
+        } catch (Exception e) {
+            e.getStackTrace();
         }
         return result;
+    }
+    
+    public void createEnv() throws SQLException {
+        System.out.println("-------------------- Process Start ---------------------");
+        TransactionTypeHolder.set(TransactionType.XA);
+        try (Connection connection = dataSource.getConnection()) {
+            connection.setAutoCommit(false);
+            PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO t_order (user_id, status) VALUES (?, ?)");
+            doInsert(preparedStatement);
+            connection.commit();
+            System.out.println("INSERT 10 orders success");
+        }
+    }
+    
+    
+    public void recovery() throws SQLException {
+        int quantity = selectAll();
+        while(quantity != 10) {
+            System.out.printf("Waiting for recovery success, current quantity of orders is %d \n", quantity);
+            try {
+                TransactionTypeHolder.set(TransactionType.XA);
+                try (Connection connection = dataSource.getConnection()) {
+                    connection.setAutoCommit(false);
+                    quantity = selectAll();
+                    Thread.sleep(12240);
+                    connection.commit();
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    
+        System.out.printf("Commit, expect:10, actual:%d \n", quantity);
+        printData();
+        System.out.println("-------------------- Process End -----------------------");
     }
 }

@@ -20,22 +20,21 @@ package org.apache.shardingsphere.example.transaction.xa.bitronix.raw.jdbc;
 import java.io.File;
 import javax.sql.DataSource;
 import org.apache.shardingsphere.driver.api.yaml.YamlShardingSphereDataSourceFactory;
-import org.apache.shardingsphere.example.core.api.ExampleExecuteTemplate;
-import org.apache.shardingsphere.example.core.api.service.ExampleService;
 
 public class ExampleMain {
     
     public static void main(final String[] args) throws Exception {
         DataSource dataSource = YamlShardingSphereDataSourceFactory.createDataSource(getFile("/META-INF/sharding-databases-tables.yaml"));
-        ExampleExecuteTemplate.run(getExampleService(dataSource));
-        ExampleExecuteTemplate.runFailure(getExampleService(dataSource));
+        // ExampleExecuteTemplate.runMysqlDownAndRecovery(getExampleService(dataSource));
+        ExampleExecuteTemplate.runAppShutDownEnv(getExampleService(dataSource));
+        // ExampleExecuteTemplate.runAppShutDownRecovery(getExampleService(dataSource));
     }
     
     private static File getFile(final String fileName) {
         return new File(ExampleMain.class.getResource(fileName).getFile());
     }
     
-    private static ExampleService getExampleService(DataSource dataSource) {
+    private static OrderServiceImpl getExampleService(DataSource dataSource) {
         return new OrderServiceImpl(dataSource);
     }
 }
